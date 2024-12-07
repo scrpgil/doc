@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>公開用文章「クラフトビールの心」</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+
+      .viewer {
+        background-color: white;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .author {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 2rem;
+      }
+
+      .content {
+        line-height: 1.8;
+      }
+
+      .paragraph {
+        margin-bottom: 1.5rem;
+        text-align: justify;
+        text-indent: 1em;
+      }
+
+      .dialog {
+        text-align: center;
+        margin: 2rem 0;
+        font-size: 1.1em;
+      }
+
+      .description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .controls {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: white;
+        padding: 0.5rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 1rem;
+      }
+
+      .controls select,
+      .controls button {
+        padding: 0.25rem;
+      }
+
+      ruby {
+        ruby-align: center;
+      }
+
+      rt {
+        font-size: 0.5em;
+        color: #666;
+      }
+
+      .image-container {
+        margin: 2rem 0;
+        text-align: center;
+      }
+      .image-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+      }
+      .image-caption {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .dialog a {
+        color: #0066cc;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .dialog a:hover {
+        color: #003366;
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 1rem;
+          padding: 0;
+        }
+
+        .viewer {
+          padding: 1rem;
+        }
+
+        .controls {
+          position: static;
+          margin-bottom: 1rem;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="viewer">
+        <div class="content" id="content">
+          <!-- コンテンツは JavaScript で動的に生成 -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ルビ辞書を拡充
+      const rubyDict = {
+        断: "だ",
+        近頃: "ちかごろ",
+        至: "いた",
+        醸造所: "じょうぞうしょ",
+        酒杯: "しゅはい",
+        風味: "ふうみ",
+        囚: "とら",
+        吉祥寺: "きちじょうじ",
+        自然体: "しぜんたい",
+        馴染: "なじ",
+        一杯: "いっぱい",
+        悠々: "ゆうゆう",
+        余韻: "よいん",
+        初心: "しょしん",
+        淡々: "たんたん",
+        強制: "きょうせい",
+        回転木馬: "かいてんもくば",
+        多種多様: "たしゅたよう",
+        制覇: "せいは",
+        店主: "てんしゅ",
+        磁石: "じしゃく",
+        静寂: "せいじゃく",
+        競走: "きょうそう",
+        店内: "てんない",
+        柑橘: "かんきつ",
+        嘲笑: "ちょうしょう",
+      };
+
+      // 英語の専門用語リスト
+      const englishTerms = {
+        brewery: "ブルワリー",
+        IPA: "アイピーエー",
+        DDH: "ダブルドライホップド",
+        "P2B Haus": "ピーツービーハウス",
+      };
+
+      // テキストコンテンツ
+      const textContent = [
+        {
+          type: "description",
+          text: "この記事は「[P2B Haus Advent Calendar 2024](https://adventar.org/calendars/11040)」7日目の記事です。文章は太宰治の「禁酒の心」を参考にしました。写真や文章の時系列はバラバラです。",
+        },
+        {
+          type: "title",
+          text: "クラフトビールの心",
+        },
+        {
+          type: "author",
+          text: "──scrpgil",
+        },
+        {
+          type: "paragraph",
+          text: "　私は、いっそクラフトビール断ちをしようと思っている。近頃、breweryが至る所に生まれ、新作ビールがほとんど毎日のように市場へ放たれている。かつて酒杯は、ゆったりと時を味わい、風味に耳を澄ますためのものであったはずだ。だが、私はいつの間にか、その「多彩さ」を追うことだけに囚われてしまっている。",
+        },
+        {
+          type: "image",
+          src: "./imgs/p2b-house.jpg",
+          caption:
+            "吉祥寺のビアバー「P2B Haus」。常時12タップが繋がり、平日には飲み放題もある！",
+          alt: "吉祥寺のビアバー「P2B Haus」。常時12タップが繋がり、平日には飲み放題もある！",
+        },
+        {
+          type: "paragraph",
+          text: "　吉祥寺の「P2B Haus」に足を運ぶと、他の客たちはごく自然体で、友人との談笑を楽しみながら、一杯ずつビールを味わっている。彼らは静かに腰掛け、それぞれが気に入ったビールや料理をゆっくりと口に運び、柔らかな声で会話を交わしている。店内には12本ものタップが並び、多彩なビールが揃っているというのに、誰ひとりとしてそれらすべてを制覇しようなどと気負う様子はない。あくまでも自分のペースで、落ち着いた気分で、ビールを味わっている。その光景は、なんとも心地よく、豊かな時間が流れているように感じられる。",
+        },
+        {
+          type: "image",
+          src: "./imgs/ryouri.jpg",
+          caption:
+            "キーマカレー。ビール2杯とセットで約2,000円。野菜が美味しくビールも進む。",
+          alt: "キーマカレー。ビール2杯とセットで約2,000円。野菜が美味しくビールも進む。",
+        },
+        {
+          type: "paragraph",
+          text: "　けれど、私だけは多彩なビールの存在に心を奪われてしまう。「今日はどんな醸造所がタップにつながっているのだろう」「まだ試したことのないスタイルがひそんでいるのではないか」と、胸がざわついて落ち着かない。いつの間にか、頭の中で“気になるビール”のチェックリストが膨れ上がり、その数を埋めるために焦り始めている。誰も強制などしていないのに、私ひとりが勝手に終わりなき競走を走っているような気分だ。",
+        },
+        {
+          type: "image",
+          src: "./imgs/12tap.jpg",
+          caption:
+            "常時12タップ。CTO IPAはここでしか飲めないハウスエール。世のCTOは必飲である。",
+          alt: "常時12タップ。ここでしか飲めないビール（CTO IPA）もある。",
+        },
+        {
+          type: "paragraph",
+          text: "　ひととき、私は思い切って決意する。もうやめよう。多彩なビールが並ぶからといって、全てを制覇する必要など、どこにもないではないか。静かな味わい、豊かな余韻、そうしたものこそが、私をここへと呼び寄せた本質だったはずだ。空になったグラスを見つめながら、私はそろそろ初心に立ち返るべきだと深く考える。味わいを知るということは、決して急ぐことではない。日々を紡ぐように、ゆっくりと杯を傾ければいい。",
+        },
+        {
+          type: "paragraph",
+          text: "　そう、今日はもう帰ろう。また別の日に来ればいいではないか。私は心を固め、顔を上げる。ところが、不意に視界に飛び込んできたのは壁に書かれた多種多様なタップリスト。醸造所の名、アルコール度数、ビアスタイル――その文字群が、まるで磁石のように私の視線を引きつける。スタッフがこちらをちらりと見て、「気になるビールはありますか？」と声をかけてくる。その問いかけを合図に、私の中で組み立て直していた理性のリストが、一気に弾け飛ぶ。",
+        },
+        {
+          type: "dialog",
+          text: "「…奈良醸造のUNDERWATERをください。」",
+        },
+        {
+          type: "image",
+          src: "./imgs/UNDERWATER.jpg",
+          caption:
+            "奈良醸造「UNDERWATER24」度数11.5%ながら飲みやすくて美味しい。ここ最近飲んだ中で特に美味しかった。",
+          alt: "奈良醸造「UNDERWATER24」度数11.5%ながら飲みやすくて美味しい。ここ最近飲んだ中で特に美味しかった。",
+        },
+        {
+          type: "paragraph",
+          text: "　ああ、やってしまった。結局、また新しい一杯を頼んでしまった。こうなるともう止まらない。私ひとり、止まれぬ回転木馬に乗ったままだ。まったくクラフトビールは魔物である。",
+        },
+        {
+          type: "image",
+          src: "./imgs/stamp-rally.jpg",
+          caption:
+            "毎年1月に開かれる周年イベント。2024年は飲んだサイズに応じてスタンプがもらえる。イベント期間中に貯めればよいのだが、一回の訪問でコンプした！",
+          alt: "毎年1月に開かれる周年イベント。2024年は飲んだサイズに応じてスタンプがもらえる。",
+        },
+        {
+          type: "image",
+          src: "./imgs/beers.jpg",
+          caption:
+            "今年飲んだビールたち。奈良醸造はどれも美味しかった！あと、JOKUN BREWING LABのFresh Hop Kolschも印象深いビールだった。",
+          alt: "今年飲んだビールたち。奈良醸造はどれも美味しかった！あと、JOKUN BREWING LABのFresh Hop Kolschも印象深いビールだった。",
+        },
+        {
+          type: "description",
+          text: "本文は以上です。P2Bさんは普通にビール飲みに行っても隣のお客さんもエンジニアだったりして楽しいです。また、[P2Bさんのサイト](https://kichijoji.p2b.haus/menu/archive/202410/)では、過去繋がっていたタップやお客から人気だったビールが紹介されており、何を飲んだか後から振り返れて感謝です！エンジニアもそうじゃない人もみんなでP2B Hausに行こう！",
+        },
+      ];
+
+      function convertMarkdownLinks(text) {
+        const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+        return text.replace(linkPattern, '<a href="$2" target="_blank">$1</a>');
+      }
+
+      function applyRuby(text) {
+        let result = text;
+
+        // 英語の専門用語のルビを適用
+        Object.entries(englishTerms).forEach(([term, ruby]) => {
+          const regex = new RegExp(term, "g");
+          result = result.replace(
+            regex,
+            `<ruby>${term}<rt>${ruby}</rt></ruby>`
+          );
+        });
+
+        // 日本語のルビを適用
+        Object.entries(rubyDict).forEach(([kanji, ruby]) => {
+          const regex = new RegExp(kanji, "g");
+          result = result.replace(
+            regex,
+            `<ruby>${kanji}<rt>${ruby}</rt></ruby>`
+          );
+        });
+
+        return result;
+      }
+
+      function renderContent(withRuby = true) {
+        const contentDiv = document.getElementById("content");
+        contentDiv.innerHTML = textContent
+          .map((item) => {
+            if (item.type === "image") {
+              return `
+                            <div class="image-container">
+                                <img src="${item.src}" alt="${
+                item.alt || ""
+              }" />
+                                ${
+                                  item.caption
+                                    ? `<div class="image-caption">${item.caption}</div>`
+                                    : ""
+                                }
+                            </div>
+                        `;
+            }
+
+            let text = item.text;
+
+            if (item.type === "description") {
+              text = convertMarkdownLinks(text);
+            }
+
+            // ルビ適用はリンク変換の後に行う
+            if (withRuby) {
+              text = applyRuby(text);
+            }
+
+            return `<div class="${item.type}">${text}</div>`;
+          })
+          .join("");
+      }
+
+      // 初期表示
+      renderContent(true);
+    </script>
+  </body>
+</html>
