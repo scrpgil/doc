@@ -3,28 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Markdown to HTML Converter</title>
+    <title>個人制作サイトをAngular 17→19にアップデートした記録</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-    <!-- highlight.jsのCSSとJavaScript -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- 追加の言語サポート -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/shell.min.js"></script>
     <style>
       body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
       }
+      .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+
       #markdown {
         border: 1px solid #eee;
         padding: 20px;
-        border-radius: 4px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       /* マークダウンのスタイル */
       #markdown h1 {
@@ -74,6 +80,15 @@
       #markdown a:hover {
         text-decoration: underline;
       }
+      #markdown img {
+        width: 100%;
+      }
+      summary {
+        border: 1px solid #000;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+      }
       .error-message {
         color: #dc3545;
         padding: 1em;
@@ -89,32 +104,29 @@
     </style>
   </head>
   <body>
-    <div id="markdown">
-      <div class="loading">Loading markdown content...</div>
+    <div class="container">
+      <div id="markdown">
+        <div class="loading">Loading markdown content...</div>
+      </div>
     </div>
 
     <script>
-      // マークダウンのオプション設定
       marked.setOptions({
-        breaks: true, // 改行を有効に
-        gfm: true, // GitHub Flavored Markdown を有効に
+        breaks: true,
+        gfm: true,
         highlight: function (code, lang) {
-          // 言語が指定されている場合はその言語でハイライト
           if (lang && hljs.getLanguage(lang)) {
             try {
               return hljs.highlight(code, { language: lang }).value;
             } catch (err) {}
           }
-          // 言語が指定されていない場合は自動検出
           try {
             return hljs.highlightAuto(code).value;
           } catch (err) {}
-          // エラーの場合は元のコードを返す
           return code;
         },
       });
 
-      // Markdownファイルを取得して表示する関数
       async function loadAndDisplayMarkdown(url) {
         const markdownContainer = document.getElementById("markdown");
 
@@ -126,21 +138,14 @@
           const markdown = await response.text();
           const html = marked.parse(markdown);
           markdownContainer.innerHTML = html;
+          hljs.highlightAll();
         } catch (error) {
           console.error("Error loading markdown:", error);
-          markdownContainer.innerHTML = `
-                    <div class="error-message">
-                        Failed to load markdown content. Please try again later.<br>
-                        Error: ${error.message}
-                    </div>
-                `;
         }
       }
 
-      // ページ読み込み時にMarkdownファイルを取得
       window.addEventListener("DOMContentLoaded", function () {
-        // Markdownファイルのパスを指定
-        const markdownUrl = "./content.md"; // このパスは実際のファイルパスに変更してください
+        const markdownUrl = "./content.md";
         loadAndDisplayMarkdown(markdownUrl);
       });
     </script>

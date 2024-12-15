@@ -1,26 +1,28 @@
-## はじめに
+# 個人制作サイトを Angular 17→19 にアップデートした記録
 
-更新遅れてすみません！
-この記事は[Angular Advent Calendar 2024](https://qiita.com/advent-calendar/2024/angular)14 日目の記事です。
-昨日の記事は[rysiva](https://qiita.com/rysiva)さんが執筆されました。
+更新が遅れてしまい、申し訳ありません！
+こちらは [Angular Advent Calendar 2024](https://qiita.com/advent-calendar/2024/angular) の 14 日目の記事となります。
+13 日目の記事は [rysiva](https://qiita.com/rysiva) さんが投稿されましたので、あわせてご覧ください。
 
-普段、業務でも Angular を使っているので 1 年間振り返ってシェアできる取り組みを記事にすることを考えていたのですが、個人制作のサイトが Angular 17 のままだったのが気になったため、アップデート時に何をしたのか共有します。
+日々の業務でも Angular を活用しているため、この 1 年間の振り返りとして共有できるトピックを考えていました。その中で、個人制作のサイトがずっと Angular 17 のまま止まっていることが気になり、今回アップデートを行うことにしました。本記事では、その更新内容とプロセスをご紹介します。
 
 ## アップデートしたサイト
 
-今回は個人制作している[アスキーアート閲覧サイト](https://aahub.org/)をアップデートしました。
-こちらのサイトは Ionic と Angular で作成されており、去年のアドベントカレンダーでも各 module のバージョンアップ等行いましたが、その後特に触っていなかったので、今回の題材にはうってつけでしょう。
+今回アップデートしたのは、個人で制作している [アスキーアート閲覧サイト](https://aahub.org/) です。
+このサイトは Ionic と Angular を用いて構築しています。昨年のアドベントカレンダーでも各モジュールのバージョンアップなどを行いましたが、その後しばらく手をつけていなかったため、今回の題材にはうってつけと考えました。
+今年は、このサイトを最新バージョンへとアップデートする手順やポイントをまとめてみたいと思います。
 
 ## アップデート後の変化
 
-ビルドシステムの変更により、build 速度が改善（1m30s→55s）されました。
-Page Speed Insight も一応測定してみましたが特にかわらず。
-ここは、SSR を試してみてみたかったところなんですが、ハマってしまって終わらず。
-後日動いたらどう変化あったか追記するかもしれません。
+ビルドシステムの変更により、ビルド速度が改善しました（約 1 分 30 秒 → 約 55 秒）。
+PageSpeed Insights でパフォーマンスを計測してみましたが、特に改善は見られませんでした。
+
+できれば SSR（Server-Side Rendering）にも挑戦してみたかったのですが、途中でハマってしまい、今回の記事には間に合いませんでした。もし今後 SSR を導入でき、変化があれば追記する予定です。
 
 ## アップデート前後の package.json
 
-wrangler とかも古いの使っていたのでついでにアップデート。
+今回のアップデートでは、`wrangler` などの古い依存パッケージもまとめて更新を行いました。
+以下は、アップデート前後の `package.json` です。
 
 <details><summary>変更前</summary>
 
@@ -217,19 +219,22 @@ wrangler とかも古いの使っていたのでついでにアップデート�
 
 ## アップデートでやったこと
 
-以下は、アップデート時にやったことです。
+今回のアップデートで行った主な作業は以下のとおりです。
 
-- 17→18 へのアップデート
-- 18→19 へのアップデート
-- 不要な import 文削除
-- signal 化
-- Cloudflare Pages へアップロード
+- Angular 17 → 18 へのアップデート
+- Angular 18 → 19 へのアップデート
+- 不要な import 文の削除
+- signal 化対応
+- Cloudflare Pages へのアップロード
 
 ## 17→18 へのアップデート
 
-毎度おなじみの ng update コマンドを実行し、言われた通りに update していく。
+おなじみの ng update コマンドを実行し、言われた通りに update していきます。
+まずは、17 から 18 にアップデートしていきます。
 
-```sh
+<details><summary>ng update</summary>
+
+```shell
 % ng update
 Using package manager: npm
 Collecting installed dependencies...
@@ -248,13 +253,64 @@ Found 82 dependencies.
 
 ```
 
-だいたい@storybook/angular あたりが依存関係でエラーでるので、個別に最新にアップデートします（今回は、`storybook@8.4.7` に更新）。
+</details>
 
+基本的に ng update で提示されたコマンドを入力してもなんらかの依存関係のエラーはでるかと思います。
+今回は@storybook/angular でエラーがでたので、個別に最新にアップデートしました
+
+```shell
+npm i storybook@8.4.7 --save-dev
+```
+
+エラーを解決し、ng udpate が実行できるようになったので再度実行します。
 `ng update @angular/cli@18 @angular/core@18`実行の途中で migration 周りを確認されるので取り合えずイエス。
+
+## 17→18 へのアップデート
+
+ここからは、`ng update` コマンドを用いて Angular のバージョンを 17 から 18 へ引き上げていきます。
+
+まず、`ng update` を実行すると、以下のようなメッセージが表示されます。
+
+<details><summary>ng update</summary>
+
+```shell
+% ng update
+Using package manager: npm
+Collecting installed dependencies...
+Found 82 dependencies.
+    We analyzed your package.json, there are some packages to update:
+
+      Name                                    Version                  Command to update
+     -------------------------------------------------------------------------------------
+      @angular-eslint/schematics              17.3.0 -> 19.0.2         ng update @angular-eslint/schematics
+      @angular/cli                            17.3.6 -> 18.2.9         ng update @angular/cli@18
+      @angular/core                           17.3.7 -> 18.2.9         ng update @angular/core@18
+      @testing-library/angular                16.0.0 -> 17.3.4         ng update @testing-library/angular
+
+    There might be additional packages which don't provide 'ng update' capabilities that are outdated.
+    You can update the additional packages by running the update command of your package manager.
+```
+
+</details>
+
+ここで、ng update から提案されたコマンドを順番に実行していきますが、しばしば依存関係エラーが発生します。
+今回は @storybook/angular に起因するエラーがあったため、該当パッケージを手動で最新バージョンに更新しました。
+
+```shell
+npm i storybook@8.4.7 --save-dev
+```
+
+このエラー解消後、ng update コマンドが正常に実行できるようになったので、改めて以下を実行します。
+
+```shell
+ng update @angular/cli@18 @angular/core@18
+```
+
+実行中にマイグレーションに関する確認が求められますが、今回の場合は特に migration による変更はないようでした。
 
 <details><summary>ng update @angular/cli@18 @angular/core@18</summary>
 
-```sh
+```shell
 % ng update @angular/cli@18 @angular/core@18
 The installed Angular CLI version is outdated.
 Installing a temporary Angular CLI versioned 18.2.12 to perform the update.
@@ -306,9 +362,11 @@ UPDATE src/app/services/worker-api.ts (4427 bytes)
 
 ## 18→19 へのアップデート
 
-18 へのアップデートと同じく ng update コマンドを実行
+Angular 18 へのアップデートが完了したら、同様に `ng update` コマンドで 19 へのアップデートを進めます。
 
-```sh
+<details><summary>ng update</summary>
+
+```shell
 % ng update
 Using package manager: npm
 Collecting installed dependencies...
@@ -326,12 +384,14 @@ Found 82 dependencies.
     You can update the additional packages by running the update command of your package manager.
 ```
 
-途中、ビルドシステムの変更や、standalone デフォルトの変更を聞かれるのでイエス！
-自動で standalone:true を削除してくれた。
+</details>
+
+ここでも、ng update が提案するコマンドを実行していきます。
+途中でビルドシステムの変更や standalone をデフォルトとするかどうかといったオプションについて尋ねられますが、今回は「Yes」を選択しました。その結果、自動的に standalone: true が削除され、standalone がデフォルト設定として適用されました。
 
 <details><summary>ng update @angular/cli @angular/core</summary>
 
-```sh
+```shell
 % ng update @angular/cli @angular/core
 The installed Angular CLI version is outdated.
 Installing a temporary Angular CLI versioned 19.0.5 to perform the update.
@@ -423,15 +483,21 @@ Optional migrations may be skipped and executed after the update process, if pre
 
 </details>
 
+また、`angular.json` もビルドシステムの変更に合わせて自動で書き換えられました。
+このあたりは自分がまだキャッチアップできていない部分だったので、migration のサポートは本当に助かります。
+
+![angular.jsonのdiff](./images/angular-json-diff.png)
+
 ## 不要な import 文削除
 
-各モジュールのアップデートが完了したので、`ionic( or ng) serve`でアプリを起動。
-新しい angular-compiler のおかげか、テンプレートでも使用していない不要な import を教えてくれるようになったので削除していく。
-たくさん読み込んでてごめんね...。
+各モジュールのアップデートが完了したら、`ionic serve` または `ng serve` でアプリを起動してみます。
+新しい Angular Compiler では、テンプレートで使用していない不要な import を警告してくれるため、それらをひとつずつ削除していきました。
+
+不要な import が多くて、やや申し訳なさを感じつつの作業でしたが、そのおかげでコードはかなりスッキリしました。
 
 <details><summary>[WARING] TS-998113: ...</summary>
 
-```sh
+```shell
 [ng] ▲ [WARNING] TS-998113: IonSplitPane is not used within the template of AppComponent [plugin angular-compiler]
 [ng]     src/app/app.component.ts:37:8:
 [ng]       37 │         IonSplitPane,
@@ -453,11 +519,12 @@ Optional migrations may be skipped and executed after the update process, if pre
 
 ## Signal 化
 
-Signal は全然キャッチアップできていないが、今後勉強していく意味合いも込めて、コマンド一発で対応する。
+Signal についてはまだ十分にキャッチアップできていなかったのですが、既存コードを signal ベースに書き換えるためのコマンドが用意されているとのことで、試しに実行してみました。
+このコマンドでは、`@Input`、`@Output`、`@ViewChild`、`@ViewChildren` などを signal ベースの書き方に変換してくれるようです。
 
 <details><summary>ng generate @angular/core:signals</summary>
 
-```sh
+```shell
 % ng generate @angular/core:signals
 ✔ Which migrations do you want to run? Convert `@Input` to the signal-based `input`, Convert `@Output` to the new `output` function, Convert
 `@ViewChild`/`@ViewChildren` and `@ContentChild`/`@ContentChildren` to the signal-based `viewChild`/`viewChildren` and `contentChild`/`contentChildren`
@@ -531,28 +598,19 @@ UPDATE src/app/pages/editor/editor.page.ts (8654 bytes)
 
 </details>
 
-```sh
- % ionic serve
-> ng run app:serve --host=localhost --port=8100
-[ng] ❯ Building...
-[ng] ✔ Building...
-[ng] Application bundle generation failed. [2.923 seconds]
-[ng] ✘ [ERROR] TS2345: Argument of type '{ mlt: Mlt; headers: string[]; aaList: AsciiArt[]; uniqueKey: string; name: string; }' is not assignable to parameter of type 'void'. [plugin angular-compiler]
-[ng]     src/app/components/mlt-viewer/mlt-viewer.component.ts:253:22:
-[ng]       253 │     this.tagJump.emit({
-[ng]           ╵                       ^
-[ng]
-[ng] Watch mode enabled. Watching for file changes...
-```
+ここまで変換を終え、一通りローカル環境でアプリが正常に動作することを確認できました。
+あとは、Cloudflare Pages へアップロードすれば完了です。
 
 ## Cloudflare Pages へのアップロード
 
-Angular 19 にアップデートした際に、esbuild を使うように書き換えてくれており、output フォルダの出力先も `www`から`www/browser`に変わりました。
-そのため、
+Cloudflare Pages へのアップロードですが、Angular 19 へのアップデートに伴い、`esbuild` を用いるようなビルドシステムへの変更が行われ、出力先のフォルダが `www` から `www/browser` へと変わりました。
+そのため、Cloudflare 側の設定も変更が必要になります。
 
-最初なぜ変わったのか理解できてなかったんですが、ng update 時の出力みたらちゃんと記載されていましたね。。
+![cloudflare pagesの設定変更](./images/cloudflare-pages.png)
 
-```sh
+最初はいつ変更されたのか気づいていませんでしたが、`ng update` 実行時のログを見直すと、しっかり記載がありました。
+
+```shell
   Application projects that are using the '@angular-devkit/build-angular' package's 'browser' and/or 'browser-esbuild' builders will be migrated to use the new 'application' builder.
   You can read more about this, including known issues and limitations, here: https://angular.dev/tools/cli/build-system-migration
     The output location of the browser build has been updated from "www" to "www/browser". You might need to adjust your deployment pipeline or, as an alternative, set outputPath.browser to "" in order to maintain the previous functionality.
@@ -562,13 +620,15 @@ UPDATE tsconfig.json (996 bytes)
   Migration completed (2 files modified).
 ```
 
-ここまでやって無事アップデート完了。
+ここまでの手順で、無事アップデートが完了しました。
 
 ## まとめ
 
-小一時間くらいでアップデート作業自体は完了しました。
-Signal や SSR 周りなど情報としてはしっていたんですが、実際に触っていないところが多くビルド周りでの変更は普通にハマってしまいました。
-特に ng udpate コマンドを色々読み飛ばして実行していたので、どこで output フォルダに browser が追加されたのか理解できておらず、[公式ドキュメント](https://angular.jp/tools/cli/build-system-migration)を読み返したり色々発見ありました。
+アップデート作業自体は、小一時間ほどで完了しました。
+Signal や SSR まわりの機能は情報として知ってはいたものの、実際に手を動かしていない部分が多く、ビルド周りの変更には正直ハマりました。
+特に `ng update` コマンドを流し読みしながら実行していたせいで、いつ出力フォルダに `browser` が追加されたのか把握できず、[公式ドキュメント](https://angular.jp/tools/cli/build-system-migration) を改めて読み直すなど、今回のアップデートで新たな発見がいくつもありました。
 
-パフォーマンスやユーザーからの挙動は特に変わりはないですが、SSR 対応がやりやすくなったらしいので次はそのあたりを着手したいと思います。
-それでは。
+本来であれば、パフォーマンスチューニングの一環として SSR 対応も試みたかったのですが、思わぬところで詰まってしまい、今回はアップデート作業のみでいったん区切りとしました。
+今後また記事を書く機会があれば、SSR 対応によるパフォーマンス数値への影響も含めて記事にしたいと思います。
+
+それでは、良いお年を！
