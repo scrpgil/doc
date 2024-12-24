@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Human User Interface Guidelineを読み直し、自分のサイトのIonButtonの見た目を見直す</title>
+    <meta
+      property="og:title"
+      content="Human User Interface Guidelineを読み直し、自分のサイトのIonButtonの見た目を見直す"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@scrpgil" />
+    <meta
+      name="twitter:title"
+      content="Human User Interface Guidelineを読み直し、自分のサイトのIonButtonの見た目を見直す"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/shell.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+
+      #markdown {
+        border: 1px solid #eee;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      /* マークダウンのスタイル */
+      #markdown h1 {
+        font-size: 2em;
+        margin-bottom: 0.5em;
+        margin-top: 1em;
+      }
+      #markdown h2 {
+        font-size: 1.5em;
+        margin-bottom: 0.5em;
+        margin-top: 1em;
+      }
+      #markdown h3 {
+        font-size: 1.3em;
+        margin-bottom: 0.5em;
+        margin-top: 1em;
+      }
+      #markdown p {
+        margin-bottom: 1em;
+        line-height: 1.6;
+      }
+      #markdown code {
+        background-color: #f5f5f5;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: "Courier New", Courier, monospace;
+      }
+      #markdown pre {
+        background-color: #f5f5f5;
+        padding: 1em;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 1em 0;
+      }
+      #markdown pre code {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+      }
+      #markdown blockquote {
+        border-left: 4px solid #ccc;
+        margin-left: 0;
+        padding-left: 1em;
+        color: #666;
+      }
+      #markdown a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+      #markdown a:hover {
+        text-decoration: underline;
+      }
+      .image-container {
+        margin: 1em 0 1.6em;
+      }
+      .image-container .box {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+      }
+      .image-container img {
+        border: 1px solid #ddd;
+      }
+      .image-container p {
+        text-align: center;
+        font-size: 0.8em;
+        color: #666;
+      }
+      summary {
+        border: 1px solid #000;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+      }
+      .error-message {
+        color: #dc3545;
+        padding: 1em;
+        border: 1px solid #dc3545;
+        border-radius: 4px;
+        margin: 1em 0;
+      }
+      .loading {
+        text-align: center;
+        padding: 2em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="markdown">
+        <div class="loading">Loading markdown content...</div>
+      </div>
+    </div>
+
+    <script>
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              return hljs.highlight(code, { language: lang }).value;
+            } catch (err) {}
+          }
+          try {
+            return hljs.highlightAuto(code).value;
+          } catch (err) {}
+          return code;
+        },
+      });
+
+      async function loadAndDisplayMarkdown(url) {
+        const markdownContainer = document.getElementById("markdown");
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const markdown = await response.text();
+          const html = marked.parse(markdown);
+          markdownContainer.innerHTML = html;
+          hljs.highlightAll();
+        } catch (error) {
+          console.error("Error loading markdown:", error);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", function () {
+        const markdownUrl = "./content.md";
+        loadAndDisplayMarkdown(markdownUrl);
+      });
+    </script>
+  </body>
+</html>
